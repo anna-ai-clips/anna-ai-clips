@@ -1,20 +1,189 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNA AI CLIPS</title>
 <style>
-body{background:#101124;color:white;font-family:Arial;text-align:center;padding:25px}
-h1{color:#b58cff}
-input,button{padding:14px;margin:10px;border-radius:10px;width:90%}
-button{background:#8b5cf6;color:white;border:0;font-weight:bold}
+*{box-sizing:border-box}
+body{
+ margin:0;background:#101124;color:white;
+ font-family:Arial,sans-serif;text-align:center;
+ padding:20px;
+}
+.container{
+ max-width:600px;margin:35px auto;
+ background:#1b1d36;padding:25px;
+ border-radius:20px;
+}
+h1{color:#b58cff;font-size:30px}
+p{color:#c9c9d8}
+input,button{
+ width:100%;padding:14px;margin:10px 0;
+ border-radius:10px;border:1px solid #444;
+ font-size:16px;
+}
+input{background:#fff;color:#111}
+button{
+ background:#8b5cf6;color:white;
+ border:0;font-weight:bold;cursor:pointer;
+}
+button:disabled{opacity:.5}
+video{
+ width:100%;max-height:400px;
+ background:black;border-radius:12px;
+ margin-top:15px;
+}
+canvas{display:none}
+.output{
+ background:#292b49;padding:15px;
+ border-radius:12px;margin-top:20px;
+}
+a{color:#c4a5ff}
 </style>
 </head>
 <body>
+
+<div class="container">
 <h1>ANNA AI CLIPS</h1>
-<h3>AI Video to Shorts Generator</h3>
-<input type="url" placeholder="Paste your video link">
-<button>Generate Shorts</button>
-<p>Free AI Shorts Platform</p>
+<p>Free Video to Shorts Generator</p>
+
+<div class="output">
+<h3>Upload Your Video</h3>
+<input type="file" id="file" accept="video/*">
+
+<video id="video" controls playsinline></video>
+
+<h3>Select Clip Duration</h3>
+<input type="number" id="start" value="0" min="0" placeholder="Start seconds">
+<input type="number" id="end" value="30" min="1" placeholder="End seconds">
+
+<button id="generate">GENERATE SHORTS</button>
+
+<p id="status">Upload a video to get started.</p>
+<canvas id="canvas" width="720" height="1280"></canvas>
+<a id="download" style="display:none" download="anna-short.webm">
+Download Your Short
+</a>
+</div>
+
+<p>ANNA AI CLIPS © 2026</p>
+</div>
+
+<script>
+const file = document.getElementById("file");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const status = document.getElementById("status");
+const generate = document.getElementById("generate");
+const download = document.getElementById("download");
+
+let recorder;
+let chunks = [];
+let animation;
+
+file.onchange = () => {
+ if (!file.files[0]) return;
+ video.src = URL.createObjectURL(file.files[0]);
+ status.textContent = "Video ready!";
+ download.style.display = "none";
+};
+
+generate.onclick = async () => {
+ if (!video.src || !video.duration) {
+   status.textContent = "Please upload a video first.";
+   return;
+ }
+
+ const start = Number(document.getElementById("start").value);
+ const end = Number(document.getElementById("end").value);
+
+ if (start < 0 || end <= start || end > video.duration) {
+   status.textContent = "Please enter a valid start and end time.";
+   return;
+ }
+
+ if (!window.MediaRecorder || !canvas.captureStream) {
+   status.textContent = "Your browser does not support video export.";
+   return;
+ }
+
+ generate.disabled = true;
+ download.style.display = "none";
+ chunks = [];
+
+ try {
+   const stream = canvas.captureStream(30);
+
+   if (video.captureStream) {
+     const source = video.captureStream();
+     source.getAudioTracks().forEach(track => stream.addTrack(track));
+   }
+
+   const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+     ? "video/webm;codecs=vp9"
+     : "video/webm";
+
+   recorder = new MediaRecorder(stream, {mimeType:mime});
+
+   recorder.ondataavailable = e => {
+     if (e.data.size) chunks.push(e.data);
+   };
+
+   recorder.onstop = () => {
+     const blob = new Blob(chunks,{type:"video/webm"});
+     download.href = URL.createObjectURL(blob);
+     download.style.display = "inline-block";
+     download.textContent = "DOWNLOAD YOUR SHORT";
+     status.textContent = "Your short is ready!";
+     generate.disabled = false;
+     stream.getTracks().forEach(t => t.stop());
+     cancelAnimationFrame(animation);
+   };
+
+   function draw() {
+     const w = video.videoWidth;
+     const h = video.videoHeight;
+     if (w && h) {
+       const scale = Math.max(720/w,1280/h);
+       const sw = 720/scale;
+       const sh = 1280/scale;
+       ctx.drawImage(video,(w-sw)/2,(h-sh)/2,sw,sh,0,0,720,1280);
+     }
+     if (!video.paused && !video.ended) {
+       animation = requestAnimationFrame(draw);
+     }
+   }
+
+   video.currentTime = start;
+
+   await new Promise(resolve => {
+     video.onseeked = resolve;
+   });
+
+   recorder.start();
+   video.play();
+   draw();
+
+   status.textContent = "Creating your vertical short...";
+
+   const stopCheck = () => {
+     if (video.currentTime >= end || video.ended) {
+       video.pause();
+       if (recorder.state === "recording") recorder.stop();
+       video.removeEventListener("timeupdate",stopCheck);
+     }
+   };
+
+   video.addEventListener("timeupdate",stopCheck);
+
+ } catch(error) {
+   status.textContent = "Error: " + error.message;
+   generate.disabled = false;
+ }
+};
+</script>
 </body>
 </html>
