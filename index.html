@@ -1,189 +1,177 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ANNA AI CLIPS</title>
 <style>
-*{box-sizing:border-box}
-body{
- margin:0;background:#101124;color:white;
- font-family:Arial,sans-serif;text-align:center;
- padding:20px;
-}
-.container{
- max-width:600px;margin:35px auto;
- background:#1b1d36;padding:25px;
- border-radius:20px;
-}
-h1{color:#b58cff;font-size:30px}
-p{color:#c9c9d8}
-input,button{
- width:100%;padding:14px;margin:10px 0;
- border-radius:10px;border:1px solid #444;
- font-size:16px;
-}
-input{background:#fff;color:#111}
-button{
- background:#8b5cf6;color:white;
- border:0;font-weight:bold;cursor:pointer;
-}
-button:disabled{opacity:.5}
-video{
- width:100%;max-height:400px;
- background:black;border-radius:12px;
- margin-top:15px;
-}
-canvas{display:none}
-.output{
- background:#292b49;padding:15px;
- border-radius:12px;margin-top:20px;
-}
-a{color:#c4a5ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080a12;color:white;font-family:Arial,sans-serif}
+header{height:70px;padding:0 6%;display:flex;align-items:center;justify-content:space-between;background:#101426;border-bottom:1px solid #282e43}
+.logo{font-size:22px;font-weight:900}.logo span{color:#9b72ff}
+.premium{color:#c4b5fd;background:#292044;padding:8px 12px;border-radius:20px;font-size:11px}
+main{max-width:1000px;margin:35px auto;padding:15px}
+.hero{text-align:center;margin-bottom:30px}
+.hero h1{font-size:clamp(30px,6vw,48px)}
+.hero h1 span{background:linear-gradient(90deg,#a78bfa,#38bdf8);background-clip:text;color:transparent}
+.hero p{color:#94a3b8;margin-top:12px;font-size:14px;line-height:1.6}
+.grid{display:grid;grid-template-columns:1.4fr .8fr;gap:18px}
+.panel{background:#111827;border:1px solid #2a3449;padding:22px;border-radius:18px;margin-bottom:18px}
+h2{font-size:17px;margin-bottom:17px}
+.tabs{display:flex;gap:10px;margin-bottom:18px}
+.tab{flex:1;text-align:center;padding:12px;background:#202a3d;border-radius:10px;color:#cbd5e1;cursor:pointer;font-size:13px}
+.tab.active{background:#6338c8;color:white}
+label{display:block;font-size:12px;color:#aebbd0;margin:16px 0 8px}
+input,select{width:100%;padding:14px;background:#090f1d;color:white;border:1px solid #344158;border-radius:10px;font-size:14px}
+.upload{display:block;text-align:center;padding:28px;border:2px dashed #475569;border-radius:14px;background:#0b1220;cursor:pointer}
+.upload b{display:block;font-size:17px;margin-bottom:8px}
+.upload small{color:#94a3b8}
+input[type=file]{display:none}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;border:0;padding:16px;margin-top:20px;border-radius:12px;background:linear-gradient(100deg,#783ce5,#247ce8);color:white;font-weight:bold;font-size:15px;cursor:pointer}
+.btn.secondary{background:#202b40;border:1px solid #39455d}
+.status{font-size:12px;color:#a5b4fc;margin-top:14px;line-height:1.6}
+.feature{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid #293247}
+.feature:last-child{border:0}
+.icon{width:36px;height:36px;border-radius:10px;background:#292044;display:grid;place-items:center;flex-shrink:0}
+.feature b{font-size:13px}
+.feature p{color:#94a3b8;font-size:11px;margin-top:5px;line-height:1.5}
+.note{font-size:11px;color:#94a3b8;background:#0b1220;padding:12px;border-radius:10px;margin-top:15px;line-height:1.6}
+video{width:100%;border-radius:12px;display:none;margin-top:15px;background:#000}
+footer{text-align:center;color:#64748b;padding:25px;font-size:11px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}main{margin-top:20px}.panel{padding:16px}}
 </style>
 </head>
 <body>
+<header>
+ <div class="logo">ANNA <span>AI</span> CLIPS</div>
+ <div class="premium">✦ AI STUDIO</div>
+</header>
 
-<div class="container">
-<h1>ANNA AI CLIPS</h1>
-<p>Free Video to Shorts Generator</p>
+<main>
+<section class="hero">
+ <h1>Make <span>Viral Shorts</span> With AI</h1>
+ <p>Paste your video link. Create vertical clips automatically.<br>One video. Multiple Shorts.</p>
+</section>
 
-<div class="output">
-<h3>Upload Your Video</h3>
-<input type="file" id="file" accept="video/*">
-
-<video id="video" controls playsinline></video>
-
-<h3>Select Clip Duration</h3>
-<input type="number" id="start" value="0" min="0" placeholder="Start seconds">
-<input type="number" id="end" value="30" min="1" placeholder="End seconds">
-
-<button id="generate">GENERATE SHORTS</button>
-
-<p id="status">Upload a video to get started.</p>
-<canvas id="canvas" width="720" height="1280"></canvas>
-<a id="download" style="display:none" download="anna-short.webm">
-Download Your Short
-</a>
+<div class="grid">
+<section>
+<div class="panel">
+<h2>🎬 Create New Project</h2>
+<div class="tabs">
+<div class="tab active" id="linkTab" onclick="tab('link')">YouTube Link</div>
+<div class="tab" id="fileTab" onclick="tab('file')">Upload Video</div>
 </div>
 
-<p>ANNA AI CLIPS © 2026</p>
+<div id="linkBox">
+<label>Paste YouTube Video URL</label>
+<input id="youtube" type="text" placeholder="https://youtube.com/watch?v=...">
 </div>
+
+<div id="fileBox" style="display:none">
+<label class="upload" for="video">
+<b>＋ Select Video</b>
+<small>Choose a video from your phone</small>
+</label>
+<input id="video" type="file" accept="video/*">
+</div>
+
+<div class="row">
+<div><label>Number of Shorts</label>
+<select id="count">
+<option>5</option><option>10</option><option>15</option><option>20</option><option selected>30</option>
+</select></div>
+<div><label>Clip Duration</label>
+<select id="duration">
+<option>15</option><option selected>30</option><option>45</option><option>60</option>
+</select></div>
+</div>
+
+<label>Video Format</label>
+<select id="format"><option>9:16 Vertical</option><option>16:9 Landscape</option><option>1:1 Square</option></select>
+
+<label>Subtitle Style</label>
+<select id="subtitle">
+<option>Viral Colorful Captions</option>
+<option>Bold White Captions</option>
+<option>Yellow Highlight Captions</option>
+<option>Minimal Captions</option>
+</select>
+
+<label>AI Options</label>
+<select id="ai">
+<option>Auto Cut + Best Moments</option>
+<option>Auto Captions</option>
+<option>Auto Zoom + Face Tracking</option>
+<option>All AI Editing Features</option>
+</select>
+
+<button class="btn" onclick="generate()">✦ GENERATE SHORTS</button>
+<div class="status" id="status">Ready. Add a video to begin.</div>
+<div class="note">AI processing requires a connected backend server. This page does not pretend to process a YouTube link on its own. Use content you own or have permission to edit.</div>
+</div>
+
+<div class="panel">
+<h2>👁 Video Preview</h2>
+<video id="preview" controls playsinline></video>
+<div id="previewText" class="note">Your uploaded video preview will appear here.</div>
+</div>
+</section>
+
+<aside>
+<div class="panel">
+<h2>⚡ AI Features</h2>
+<div class="feature"><div class="icon">✂️</div><div><b>Auto Cutting</b><p>Automatically create multiple clips.</p></div></div>
+<div class="feature"><div class="icon">🧠</div><div><b>AI Best Moments</b><p>Identify interesting moments in a video.</p></div></div>
+<div class="feature"><div class="icon">💬</div><div><b>Auto Subtitles</b><p>English captions with colorful words.</p></div></div>
+<div class="feature"><div class="icon">🎯</div><div><b>Face Tracking</b><p>Smart zoom and subject framing.</p></div></div>
+<div class="feature"><div class="icon">🎵</div><div><b>Background Music</b><p>Add music you have permission to use.</p></div></div>
+<div class="feature"><div class="icon">📱</div><div><b>Vertical Export</b><p>Prepare videos for Shorts and Reels.</p></div></div>
+</div>
+
+<div class="panel">
+<h2>📂 My Studio</h2>
+<div class="feature"><div class="icon">🎞️</div><div><b>My Projects</b><p>Your saved projects will appear here when storage is connected.</p></div></div>
+<div class="feature"><div class="icon">⬇️</div><div><b>My Downloads</b><p>Access your exported clips.</p></div></div>
+</div>
+</aside>
+</div>
+</main>
+<footer>ANNA AI CLIPS · AI SHORT VIDEO STUDIO</footer>
 
 <script>
-const file = document.getElementById("file");
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
-const status = document.getElementById("status");
-const generate = document.getElementById("generate");
-const download = document.getElementById("download");
-
-let recorder;
-let chunks = [];
-let animation;
-
-file.onchange = () => {
- if (!file.files[0]) return;
- video.src = URL.createObjectURL(file.files[0]);
- status.textContent = "Video ready!";
- download.style.display = "none";
-};
-
-generate.onclick = async () => {
- if (!video.src || !video.duration) {
-   status.textContent = "Please upload a video first.";
-   return;
+let selectedFile=null;
+let videoURL=null;
+function tab(which){
+ document.getElementById('linkBox').style.display=which==='link'?'block':'none';
+ document.getElementById('fileBox').style.display=which==='file'?'block':'none';
+ document.getElementById('linkTab').classList.toggle('active',which==='link');
+ document.getElementById('fileTab').classList.toggle('active',which==='file');
+}
+document.getElementById('video').addEventListener('change',function(){
+ selectedFile=this.files[0];
+ if(!selectedFile)return;
+ if(videoURL)URL.revokeObjectURL(videoURL);
+ videoURL=URL.createObjectURL(selectedFile);
+ let v=document.getElementById('preview');
+ v.src=videoURL;
+ v.style.display='block';
+ document.getElementById('previewText').style.display='none';
+ document.getElementById('status').textContent='Video selected. Preview ready.';
+});
+function generate(){
+ let isLink=document.getElementById('linkBox').style.display!=='none';
+ let link=document.getElementById('youtube').value.trim();
+ if(isLink&&!link){alert('Please paste a YouTube link.');return;}
+ if(!isLink&&!selectedFile){alert('Please select a video.');return;}
+ if(isLink){
+  document.getElementById('status').textContent='YouTube link received. Connect the authorized video-processing backend to generate Shorts.';
+ }else{
+  document.getElementById('status').textContent='Video loaded. Automatic AI cutting will be available after the processing backend is connected.';
  }
-
- const start = Number(document.getElementById("start").value);
- const end = Number(document.getElementById("end").value);
-
- if (start < 0 || end <= start || end > video.duration) {
-   status.textContent = "Please enter a valid start and end time.";
-   return;
- }
-
- if (!window.MediaRecorder || !canvas.captureStream) {
-   status.textContent = "Your browser does not support video export.";
-   return;
- }
-
- generate.disabled = true;
- download.style.display = "none";
- chunks = [];
-
- try {
-   const stream = canvas.captureStream(30);
-
-   if (video.captureStream) {
-     const source = video.captureStream();
-     source.getAudioTracks().forEach(track => stream.addTrack(track));
-   }
-
-   const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-     ? "video/webm;codecs=vp9"
-     : "video/webm";
-
-   recorder = new MediaRecorder(stream, {mimeType:mime});
-
-   recorder.ondataavailable = e => {
-     if (e.data.size) chunks.push(e.data);
-   };
-
-   recorder.onstop = () => {
-     const blob = new Blob(chunks,{type:"video/webm"});
-     download.href = URL.createObjectURL(blob);
-     download.style.display = "inline-block";
-     download.textContent = "DOWNLOAD YOUR SHORT";
-     status.textContent = "Your short is ready!";
-     generate.disabled = false;
-     stream.getTracks().forEach(t => t.stop());
-     cancelAnimationFrame(animation);
-   };
-
-   function draw() {
-     const w = video.videoWidth;
-     const h = video.videoHeight;
-     if (w && h) {
-       const scale = Math.max(720/w,1280/h);
-       const sw = 720/scale;
-       const sh = 1280/scale;
-       ctx.drawImage(video,(w-sw)/2,(h-sh)/2,sw,sh,0,0,720,1280);
-     }
-     if (!video.paused && !video.ended) {
-       animation = requestAnimationFrame(draw);
-     }
-   }
-
-   video.currentTime = start;
-
-   await new Promise(resolve => {
-     video.onseeked = resolve;
-   });
-
-   recorder.start();
-   video.play();
-   draw();
-
-   status.textContent = "Creating your vertical short...";
-
-   const stopCheck = () => {
-     if (video.currentTime >= end || video.ended) {
-       video.pause();
-       if (recorder.state === "recording") recorder.stop();
-       video.removeEventListener("timeupdate",stopCheck);
-     }
-   };
-
-   video.addEventListener("timeupdate",stopCheck);
-
- } catch(error) {
-   status.textContent = "Error: " + error.message;
-   generate.disabled = false;
- }
-};
+}
 </script>
 </body>
 </html>
